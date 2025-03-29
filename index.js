@@ -1,71 +1,25 @@
-// Importa dependencias necesarias
+// Requiriendo las dependencias necesarias
 const express = require('express');
-const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config(); // Cargar variables de entorno desde .env
 
-// Crea la aplicación Express
 const app = express();
+const port = process.env.PORT || 5000; // Establecer puerto desde .env o 5000 por defecto
 
-// Configura el puerto donde se ejecutará el servidor
-const port = process.env.PORT || 3000;
+// Conexión a MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('Conectado a MongoDB'))
+  .catch((err) => console.log('Error de conexión a MongoDB:', err));
 
-// Middleware para habilitar CORS
-app.use(cors());
-
-// Middleware para parsear el cuerpo de las solicitudes en JSON
+// Middleware para parsear el cuerpo de las solicitudes como JSON
 app.use(express.json());
 
-// Ruta de prueba GET
-app.get('/api', (req, res) => {
-  res.json({
-    message: 'Bienvenido a tu API Global',
-    description: 'Esta API está configurada para manejar múltiples rutas y funciones.'
-  });
+// Ruta de prueba
+app.get('/', (req, res) => {
+  res.send('¡La API está funcionando correctamente!');
 });
 
-// Ruta para crear datos POST
-app.post('/api/data', (req, res) => {
-  const { title, content } = req.body;
-
-  if (!title || !content) {
-    return res.status(400).json({ message: 'El título y el contenido son obligatorios' });
-  }
-
-  res.status(201).json({
-    message: 'Datos creados correctamente',
-    data: { title, content }
-  });
-});
-
-// Ruta para actualizar datos PUT
-app.put('/api/data/:id', (req, res) => {
-  const { id } = req.params;
-  const { title, content } = req.body;
-
-  if (!title || !content) {
-    return res.status(400).json({ message: 'El título y el contenido son obligatorios' });
-  }
-
-  res.json({
-    message: `Datos con ID ${id} actualizados correctamente`,
-    data: { id, title, content }
-  });
-});
-
-// Ruta para eliminar datos DELETE
-app.delete('/api/data/:id', (req, res) => {
-  const { id } = req.params;
-
-  res.json({
-    message: `Dato con ID ${id} eliminado correctamente`
-  });
-});
-
-// Middleware para manejar rutas no encontradas (404)
-app.use((req, res) => {
-  res.status(404).json({ message: 'Ruta no encontrada' });
-});
-
-// Inicia el servidor en el puerto 3000
+// Iniciar el servidor
 app.listen(port, () => {
-  console.log(`Servidor API escuchando en http://localhost:${port}`);
+  console.log(`Servidor en ejecución en el puerto ${port}`);
 });
